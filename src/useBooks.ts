@@ -1,6 +1,9 @@
 import { useState, useEffect } from "react";
 import { collection, query, orderBy, onSnapshot } from "firebase/firestore";
-import { db } from "./firebase/firebaseInit";
+import { db, auth } from "./firebase/firebaseInit";
+import { addDoc } from 'firebase/firestore';
+
+
 
 export type TBook = {
     id: string;
@@ -30,7 +33,14 @@ export default function useBooks(): UseBooksReturnType {
     }, []);
 
     const addBook = async (book: TBook) => {
-        console.log(book);
+        const { uid } = auth.currentUser!;
+        const docRef= await collection(db, "books");
+        await addDoc(docRef, {
+            ...book,
+            uid,
+            createdAt: new Date(),
+            imageURL: "",
+        });
     };
     
     return [books, addBook];
